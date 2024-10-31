@@ -327,7 +327,7 @@
     \[
         a \sim \pi_\theta(\cdot|s) \ \Longleftrightarrow \ a = \mu_\theta(s) + \mathrm{diag}(\sigma_\theta(s)) z, \ z \sim \mathcal{N}(0, I_m)
     \]
-    where $\mu_\theta$ and $\sigma_\theta$ are neural networks mapping states to means and standard deviations.\footnote{In practice, $\sigma$ often does not depend on $s$, and we store $\log \sigma \in \mathbb{R}^m$ rather than $\sigma \in \mathbb{R}^m_+$ in $\theta$.}
+    where $\mu_\theta$ and $\sigma_\theta$ are neural networks mapping states to means and standard deviations.\footnote{In practice, $\sigma$ often does not depend on $s$ and we store $\log \sigma \in \mathbb{R}^m$ rather than $\sigma \in \mathbb{R}^m_+$ in $\theta$.}
 \end{frame}
 
 \begin{frame}{Policy-based algorithms}
@@ -365,15 +365,6 @@
     LHS: the graal. RHS: things we observe ($R(\tau)$) or know by design ($\nabla_\theta \log \pi_\theta$).
 \end{frame}
 
-\begin{frame}{Log-policy gradient example}
-    With a diagonal Gaussian policy $\mu_\theta(s), \sigma_\theta$:
-    \begin{align*}
-        \log \pi_\theta(a|s) & = -\frac{1}{2} \sum_{i=1}^k \left(\frac{(a_i - \mu_{\theta,i}(s))^2}{\sigma_{\theta,i}^2} + 2 \log \sigma_{\theta,i}\right) - \frac{k}{2} \log 2\pi \\
-        \nabla_\theta \log \pi_\theta(a|s) & = \sum_{i=1}^k \frac{a_i - \mu_{\theta,i}(s)}{\sigma_{\theta,i}^2} \nabla_\theta \mu_{\theta,i}(s) +  \frac{(a_i - \mu_{\theta,i}(s))^2 - \sigma^2}{\sigma_{\theta,i}^3} \nabla_\theta \sigma_{\theta,i}
-    \end{align*}
-    where $s \mapsto \mu_\theta(s)$ is typically a neural network from which we can get $\nabla_\theta \mu_\theta(s)$.
-\end{frame}
-
 \begin{frame}{Policy gradient theorem: proof sketch}
     \begin{align*}
         \nabla_{\theta} J(\theta)
@@ -384,6 +375,16 @@
         & = \int_{\tau} R(\tau) \sum_{s_t, a_t \in \tau} \nabla_\theta \log \pi_\theta(a_t | s_t) \mathbb{P}(\tau|\theta) \mathrm{d}\tau & \text{expand $\mathbb{P}(\tau|\theta)$ as product} \\
         & = \mathbb{E}_{\tau \sim \pi_{\theta}} \left(R(\tau) \sum_{s_t, a_t \in \tau} \nabla_\theta \log \pi_\theta(a_t | s_t)\right) & \text{integral as expectation}
     \end{align*}
+\end{frame}
+
+\begin{frame}{Log-policy gradient example}
+    With a diagonal Gaussian policy $\mu_\theta(s), \sigma_\theta$:
+    \begin{align*}
+        \pi_\theta(a|s) & = \prod_{i=1}^{\mathrm{dim}(a)} \frac{1}{\sqrt{2 \pi \sigma_{\theta,i}^2}} \exp\left(\frac{-(a_i - \mu_{\theta,i}(s))^2}{\sigma_{\theta,i}^2}\right) \\
+        \log \pi_\theta(a|s) & = -\frac{1}{2} \sum_{i=1}^{\mathrm{dim}(a)} \left[\frac{(a_i - \mu_{\theta,i}(s))^2}{\sigma_{\theta,i}^2} + 2 \log \sigma_{\theta,i} + \log 2\pi \right] \\
+        \nabla_\theta \log \pi_\theta(a|s) & = \sum_{i=1}^{\mathrm{dim}(a)} \left[\frac{a_i - \mu_{\theta,i}(s)}{\sigma_{\theta,i}^2} \nabla_\theta \mu_{\theta,i}(s) +  \left(\frac{(a_i - \mu_{\theta,i}(s))^2}{\sigma_{\theta,i}^3} - \frac{1}{\sigma_{\theta,i}}\right) \nabla_\theta \sigma_{\theta,i}\right]
+    \end{align*}
+    where $s \mapsto \mu_\theta(s)$ is typically a neural network, from which we get $\nabla_\theta \mu_\theta(s)$.
 \end{frame}
 
 \begin{frame}{REINFORCE (1/2)}
