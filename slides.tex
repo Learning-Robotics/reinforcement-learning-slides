@@ -277,7 +277,9 @@
     In the stochastic setting, the goal of reinforcement learning is:
     \begin{align*}
         \max_{\pi} \ & \mathbb{E}_{\tau} [R(\tau)] \\
-        \mathrm{s.t.} \ & \tau = (s_0, a_0, s_1, a_1, \ldots) \\
+        \mathrm{s.t.} \
+        & R(\tau) = \textstyle \sum_t r_t \\
+        & \tau = (s_0, a_0, r_0, s_1, a_1, r_1, \ldots) \\
         & s_0 \sim \rho_0(\cdot) \\
         & o_0 \sim z(\cdot | s_0) \\
         & a_0 \sim \pi(\cdot | o_0) \\
@@ -287,16 +289,22 @@
 \end{frame}
 
 \begin{frame}{Value functions}
-    State value functions $V$:
+    State value functions $V(s)$:
     \begin{itemize}
         \item \textbf{On-policy:} expected return from a given policy: $V^\pi(s) = \mathbb{E}_{\tau \sim \pi}(R(\tau) | s_0 = s)$
         \item \textbf{Optimal:} best return we can expect from a state: $V^*(s) = \max_\pi \mathbb{E}_{\tau \sim \pi}(R(\tau) | s_0 = s)$
     \end{itemize}
-    State-action value functions $Q$:
-    \begin{itemize}
-        \item \textbf{On-policy:} expected return from following policy: $Q^\pi(s, a) = \mathbb{E}_{\tau \sim \pi}(R(\tau) | s_0 = s, a_0 = a)$
-        \item \textbf{Optimal:} best return we can expect: $Q^*(s, a) = \max_\pi \mathbb{E}_{\tau \sim \pi}(R(\tau) | s_0 = s, a_0 = a)$
-    \end{itemize}
+    There are also state-action value functions $Q(s, a)$.
+
+    Value functions satisfy the Bellman equation:
+    \begin{block}{Bellman equation}
+        \[
+            V^*(s) = \max_\pi \mathbb{E}_{a \sim \pi(\cdot | s), (r, s') \sim p(s' | s, a)}[r + \gamma V^*(s')]
+        \]
+    \end{block}
+    An optimal policy $\pi^*$ can be derived from an optimal value function $V^*$.
+
+    Connections to optimal control (\emph{e.g.} differential dynamic programming) and $Q$-learning.
 \end{frame}
 
 \begin{frame}{Components of an RL algorithm}
