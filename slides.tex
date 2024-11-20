@@ -350,13 +350,26 @@
 \end{frame}
 
 \begin{frame}{Policy-based algorithms}
-    A policy-based algorithm updates policy parameters $\theta$ iteratively.
+    \begin{columns}
+        \begin{column}{0.54\textwidth}
+            At each iteration $k$:
+            \begin{itemize}
+                \item \textbf{Collect} a \emph{batch} of episodes $\mathcal{D}_k = \{ \tau \}$
+                \item \textbf{Update} policy parameters $$\theta_{k+1} = \mathrm{update}(\theta_k, \mathcal{D}_k)$$ to get a new policy $\pi_{\theta_{k+1}}$
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.44\textwidth}
+            \begin{figure}
+                \includegraphics[height=5cm]{genfig/training.pdf}
+            \end{figure}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-    At each iteration $k$:
-    \begin{itemize}
-        \item Collect a \emph{batch} of episodes $\mathcal{D}_k = \{ \tau \}$
-        \item Apply some update $\theta_{k+1} = \mathit{update}(\theta_k, \mathcal{D}_k)$ to get a new policy $\pi_{\theta_{k+1}}$
-    \end{itemize}
+\begin{frame}{Rolling out episodes with a simulator}
+    \begin{figure}
+        \includegraphics[width=\columnwidth]{figures/upkie-training.png}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{Policy optimization}
@@ -482,29 +495,9 @@
     \vspace{-1.5em}
 \end{frame}
 
-\section{Training with PPO}
-
-\begin{frame}{Training}
+\begin{frame}{Training with PPO}
     \begin{figure}
-        \includegraphics[height=6.5cm]{genfig/training.pdf}
-    \end{figure}
-\end{frame}
-
-\begin{frame}{Environment}
-    \begin{figure}
-        \includegraphics[height=6.5cm]{genfig/training-env.pdf}
-    \end{figure}
-\end{frame}
-
-\begin{frame}{Rolling out episodes with a simulator}
-    \begin{figure}
-        \includegraphics[width=\columnwidth]{figures/upkie-training.png}
-    \end{figure}
-\end{frame}
-
-\begin{frame}{Curriculum}
-    \begin{figure}
-        \includegraphics[height=6.5cm]{genfig/training-curriculum.pdf}
+        \includegraphics[height=6.5cm]{genfig/training-ppo.pdf}
     \end{figure}
 \end{frame}
 
@@ -518,9 +511,9 @@
     If training goes well, both eventually plateau at their maximum values.
 \end{frame}
 
-\begin{frame}{Training with PPO}
+\begin{frame}{Curriculum}
     \begin{figure}
-        \includegraphics[height=6.5cm]{genfig/training-ppo.pdf}
+        \includegraphics[height=6.5cm]{genfig/training-curriculum.pdf}
     \end{figure}
 \end{frame}
 
@@ -546,12 +539,36 @@
 \end{frame}
 
 \begin{frame}{Crossing the gap}
-    To help generalize across the sim-to-real gap:
+    General reinforcement learning techniques:
+    \begin{itemize}
+        \item Normalize observations and actions
+        \item Augment observations with history
+        \item Curriculum learning
+        \item Reward shaping
+    \end{itemize}
+    For the sim-to-real gap in robotics:
     \begin{itemize}
         \item Domain randomization
         \item Data-based simulation
         \item Teacher-student distillation
     \end{itemize}
+\end{frame}
+
+\begin{frame}{Observation-action normalization}
+    Unnormalized actions don't work well on actors with Gaussian policies:
+    \begin{itemize}
+        \item Bounds too large $\Rightarrow$ sampled actions cluster around zero.
+        \item Bounds too small $\Rightarrow$ sampled actions saturate all the time, \emph{bang-bang} behavior.
+    \end{itemize}
+    \textbf{Good practice:} bound observations/states, rescale actions to $[-1, 1]$.
+\end{frame}
+
+\begin{frame}{Augmenting observations with history}
+    We assumed a Markovian system, but real systems have lag:
+    \begin{block}{Definition}
+        The \emph{lag of a system} is the number of observations required to estimate its state.
+    \end{block}
+    \textbf{Counter-measure:} augment observations with history to restore the Markov property.
 \end{frame}
 
 \begin{frame}{Domain randomization}
@@ -573,6 +590,14 @@
     \blfootcite{hwangbo2019}
 \end{frame}
 
+\begin{frame}{Policy with history and hybrid simulation}
+    \begin{figure}
+        \includegraphics[height=6cm]{figures/quadruped-training.png}
+    \end{figure}
+    \vspace{-0.7cm}
+    \blfootcite{hwangbo2019}
+\end{frame}
+
 \begin{frame}{Teacher-student distillation}
     \begin{itemize}
         \item Train a \textbf{teacher policy} in simulation with privileged information
@@ -583,33 +608,6 @@
         \includegraphics[height=14em]{figures/teacher-student.png}
     \end{figure}
     \blfootcite{cheng2024extreme}
-\end{frame}
-
-\begin{frame}{Training a policy}
-    General things to do when training a policy:
-    \begin{itemize}
-        \item Augment observations with history
-        \item Curriculum learning
-        \item Normalize observations and actions
-        \item Reward shaping
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Augmenting observations with history}
-    We assumed a Markovian system, but real systems have lag:
-    \begin{block}{Definition}
-        The \emph{lag of a system} is the number of observations required to estimate its state.
-    \end{block}
-    \textbf{Counter-measure:} augment observations with history to restore the Markov property.
-\end{frame}
-
-\begin{frame}{Observation-action normalization}
-    Unnormalized actions don't work well on actors with Gaussian policies:
-    \begin{itemize}
-        \item Bounds too large $\Rightarrow$ sampled actions cluster around zero.
-        \item Bounds too small $\Rightarrow$ sampled actions saturate all the time, \emph{bang-bang} behavior.
-    \end{itemize}
-    \textbf{Good practice:} bound observations/states, rescale actions to $[-1, 1]$.
 \end{frame}
 
 \begin{frame}{Curriculum learning}
@@ -692,7 +690,7 @@
     \printbibliography[heading=none]
 \end{frame}
 
-\section{Bonus slides}
+\section{Bonus slides on PPO}
 
 % \begin{frame}{Link between discount and time window}
 %     Context:
@@ -702,16 +700,6 @@
 %     \end{itemize}
 %     Then, taking $\gamma = 1 - \frac{\Delta t}{T}$, ...
 % \end{frame}
-
-\begin{frame}{Bellman equation}
-    Value functions satisfy the Bellman equation:
-    \begin{block}{Bellman equation}
-        \[
-            V^*(s) = \max_\pi \mathbb{E}_{a \sim \pi(\cdot | s), (r, s') \sim p(s' | s, a)}[r + \gamma V^*(s')]
-        \]
-    \end{block}
-    This is a connection to optimal control (\emph{e.g.} differential dynamic programming) and $Q$-learning, but not our topic today.
-\end{frame}
 
 \begin{frame}{Intuition behind clipping in PPO}
     When the advantage is positive:
@@ -759,14 +747,6 @@
     \begin{adjustbox}{height=12em, keepaspectratio, center}
         \includegraphics[width=\columnwidth]{figures/tensorboard-ppo.png}
     \end{adjustbox}
-\end{frame}
-
-\begin{frame}{Policy with history and hybrid simulation}
-    \begin{figure}
-        \includegraphics[height=6cm]{figures/quadruped-training.png}
-    \end{figure}
-    \vspace{-0.7cm}
-    \blfootcite{hwangbo2019}
 \end{frame}
 
 \end{document}
