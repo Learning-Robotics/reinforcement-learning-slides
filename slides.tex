@@ -124,7 +124,7 @@
         \includegraphics[height=5cm]{figures/2024-berkeley-humanoid.jpg}
     \end{figure}
     \begin{center}
-        Policy trained by RL with light domain randomization~\cite{liao2024berkeley}
+        Policy trained with current RL techniques~\cite{liao2024berkeley}
     \end{center}
     \blfootnote{Video: \url{https://youtu.be/oPNkeoGMvAE}}
 \end{frame}
@@ -572,15 +572,29 @@
 \end{frame}
 
 \begin{frame}{Domain randomization}
-    Randomize selected environment parameters:
-    \begin{itemize}
-        \item \textbf{Robot geometry:} limb lengths, wheel diameters, \ldots
-        \item \textbf{Inertias:} masses, mass distributions
-        \item \textbf{Initial state:} $s_0 \sim \rho_0(\cdot)$
-        \item \textbf{Actuation models:} delays, bandwidth, \ldots
-        \item \textbf{Perturbations:} send $(1 \pm \epsilon) \tau$ torques\ldots
-    \end{itemize}
-    Domain randomization makes policies more conservative.
+    \begin{columns}
+        \begin{column}{0.64\textwidth}
+            Randomize selected environment parameters:
+            \begin{itemize}
+                \item \textbf{Robot geometry:} limb lengths, wheel diameters, \ldots
+                \item \textbf{Inertias:} masses, mass distributions
+                \item \textbf{Initial state:} $s_0 \sim \rho_0(\cdot)$
+                \item \textbf{Actuation models:} delays, bandwidth, \ldots
+                \item \textbf{Perturbations:} send $(1 \pm \epsilon) \tau$ torques\ldots
+            \end{itemize}
+
+            ~
+
+            There is a tradeoff to this:
+            \begin{itemize}
+                \item Pro: closer/may include real-robot distribution.
+                \item Con: makes policies \textbf{more conservative}.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.34\textwidth}
+            \includegraphics[height=4.5cm]{figures/domain-randomization.png}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \begin{frame}{Data-based actuation models}
